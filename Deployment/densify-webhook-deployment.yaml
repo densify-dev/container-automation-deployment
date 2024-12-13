@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: densify-webhook-server
+  namespace: densify-automation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: densify-webhook
+  template:
+    metadata:
+      labels:
+        app: densify-webhook
+    spec:
+      containers:
+        - name: densify-webhook
+          image: densify/container-automation:1.0
+          ports:
+            - containerPort: 8443
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          env:
+            - name: DENSIFY_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: densify-api-secret
+                  key: DENSIFY_USERNAME
+            - name: DENSIFY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: densify-api-secret
+                  key: DENSIFY_PASSWORD
+            - name: DENSIFY_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: densify-config
+                  key: DENSIFY_BASE_URL
+            - name: CLUSTER_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: cluster-info
+                  key: clusterName
+            - name: CONFIG_FILE_PATH
+              value: "/data/densify/config/densify-automation-policy/densify-automation-policy"
+          volumeMounts:
+            - name: webhook-certs
+              mountPath: "/etc/webhook/certs"
+              readOnly: true
+            - name: recommendations-volume
+              mountPath: /data/densify
+            - name: config-volume
+              mountPath: /data/densify/config/densify-automation-policy
+              readOnly: true
+      volumes:
+        - name: webhook-certs
+          secret:
+            secretName: densify-automation-tls
+            items:
+              - key: tls.crt
+                path: server.pem
+              - key: tls.key
+                path: server-key.pem
+        - name: recommendations-volume
+          persistentVolumeClaim:
+            claimName: densify-recommendations-pvc
+        - name: config-volume
+          projected:
+            sources:
+              - configMap:
+                  name: densify-automation-policy

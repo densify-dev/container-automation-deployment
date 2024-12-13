@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: densify-recommendations-pv
+  namespace: densify-automation
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /mnt/data/densify-recommendations
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: densify-recommendations-pvc
+  namespace: densify-automation
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi

@@ -1,0 +1,51 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cleanup-old-pods
+  namespace: densify-automation
+spec:
+  schedule: "00 07 * * *" # Runs every day at 7:00 AM
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          serviceAccountName: cleanup-service-account # Ensure this account has pod deletion permissions
+          containers:
+          - name: pod-cleanup
+            image: bitnami/kubectl:latest # Lightweight kubectl image
+            command: ["/bin/sh", "-c"]
+            args:
+            - |
+              echo "$(date '+%Y-%m-%d %H:%M:%S') - Starting pod cleanup"
+
+              # Retain only the latest 1 successful densify-recommendations-fetcher pod and delete older ones
+              kubectl get pods -n densify-automation --field-selector=status.phase=Succeeded -o=jsonpath='{.items[*].metadata.name}' \
+              | tr ' ' '\n' \
+              | grep densify-recommendations-fetcher \
+              | head -n -1 \
+              | xargs -r kubectl delete pod -n densify-automation
+
+              # Retain only the latest 1 failed densify-recommendations-fetcher pod and delete older ones
+              kubectl get pods -n densify-automation --field-selector=status.phase=Failed -o=jsonpath='{.items[*].metadata.name}' \
+              | tr ' ' '\n' \
+              | grep densify-recommendations-fetcher \
+              | head -n -1 \
+              | xargs -r kubectl delete pod -n densify-automation
+
+              # Retain only the latest 1 successful cleanup-old-pods pod and delete older ones
+              kubectl get pods -n densify-automation --field-selector=status.phase=Succeeded -o=jsonpath='{.items[*].metadata.name}' \
+              | tr ' ' '\n' \
+              | grep cleanup-old-pods \
+              | head -n -1 \
+              | xargs -r kubectl delete pod -n densify-automation
+
+              # Retain only the latest 1 failed cleanup-old-pods pod and delete older ones
+              kubectl get pods -n densify-automation --field-selector=status.phase=Failed -o=jsonpath='{.items[*].metadata.name}' \
+              | tr ' ' '\n' \
+              | grep cleanup-old-pods \
+              | head -n -1 \
+              | xargs -r kubectl delete pod -n densify-automation
+
+              echo "$(date '+%Y-%m-%d %H:%M:%S') - Pod cleanup completed"
+          restartPolicy: Never

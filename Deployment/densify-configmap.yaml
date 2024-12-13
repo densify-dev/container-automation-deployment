@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: densify-config
+  namespace: densify-automation
+data:
+  DENSIFY_BASE_URL: "https://<customerName>.densify.com:443"

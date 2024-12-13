@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: densify-automation-policy
+  namespace: densify-automation
+data:
+    # Valid options are: 
+        # CPULimit: Disable/Enable   
+        # CPURequest: Disable/Enable
+        # MemLimit: Disable/Enable
+        # MemRequest: Disable/Enable
+        # DownsizeUpsize: Downsize/Upsize/Both
+        # SetUninitializedValues: Disable/Enable        This option indicates whether you want previously unset settings to now have a value as per Densify's recommendation
+  densify-automation-policy: |-
+    CPULimit: Disable   
+    CPURequest: Enable
+    MemLimit: Disable
+    MemRequest: Disable
+    DownsizeUpsize: Downsize
+    SetUninitializedValues: Disable
