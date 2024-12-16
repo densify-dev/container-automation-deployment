@@ -60,7 +60,7 @@ kubectl  create  namespace  densify-automation
  
 #### 2. Configure TLS Certificates
 
-**Option 1.** [Install cert-manager (Recommended)](/Documentation/Certificates-CertManager.md)
+**Option 1.** [Install cert-manager](/Documentation/Certificates-CertManager.md)
 
 **Option 2.** [Generate Certificates Manually](/Documentation/Certificates-Manual.md)
   

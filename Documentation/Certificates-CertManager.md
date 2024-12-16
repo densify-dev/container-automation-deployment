@@ -1,13 +1,28 @@
-# Install cert-manager
+# Using cert-manager for Certificate Creation and Management
 
-cert-manager simplifies certificate lifecycle management for Kubernetes. Follow one of these options:
+## Quick Links
+- [Using cert-manager for Certificate Creation and Management](#using-cert-manager-for-certificate-creation-and-management)
+  - [Quick Links](#quick-links)
+  - [Overview](#overview)
+  - [Install cert-manager](#install-cert-manager)
+    - [Using Helm](#using-helm)
+  - [Verify that cert-manager components are running:](#verify-that-cert-manager-components-are-running)
+  - [Deploy the `ClusterIssuer` configuration:](#deploy-the-clusterissuer-configuration)
+  - [Review and update if necessary `./CertManager/certificate-creation.yaml`](#review-and-update-if-necessary-certmanagercertificate-creationyaml)
+  - [Deploy the certificate configuration:](#deploy-the-certificate-configuration)
+  - [Enable certManager to automate management of your certificate](#enable-certmanager-to-automate-management-of-your-certificate)
+  
+  
+## Overview
+
+cert-manager simplifies certificate lifecycle management for Kubernetes. Follow one of these options to install and configure cert-manager.
 
 
-1. Install cert-manager:
+## Install cert-manager
 
     Install cert-manager using either the Helm option or via applying its manifest directly. 
    
-   **Using Helm:**
+   ### Using Helm
 
     ```bash
     helm repo add jetstack https://charts.jetstack.io
@@ -21,24 +36,26 @@ cert-manager simplifies certificate lifecycle management for Kubernetes. Follow 
     ```
 
 
-    **Apply its Manifest Directly:**
+    ###Apply its Manifest Directly:
     ```bash
     kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.16.2/cert-manager.yaml
     ```
 
-2. Verify that cert-manager components are running:
+## Verify that cert-manager components are running:
     ```bash
     kubectl get pods --namespace cert-manager
     ```
-3. Deploy the `ClusterIssuer` configuration:
+## Deploy the `ClusterIssuer` configuration:
     ```bash
     kubectl apply -f ./CertManager/selfsigned-clusterissuer.yaml
     ```
-4. Review and update if necessary `./CertManager/certificate-creation.yaml`
+## Review and update if necessary `./CertManager/certificate-creation.yaml`
 
-5. Deploy the certificate configuration:
+## Deploy the certificate configuration:
     ```bash
     kubectl apply -f ./CertManager/certificate-creation.yaml
     ```
 
+## Enable certManager to automate management of your certificate
 
+Uncomment the annotation section 'cert-manager.io/inject-ca-from' to allow CertManager to auto-inject caBundle into your MutatingWebhookConfiguration.
