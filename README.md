@@ -1,7 +1,19 @@
 
 # Densify Container Automation - Mutating Admission Controller
 
- 
+## Quick Links
+- [Densify Container Automation - Mutating Admission Controller](#densify-container-automation---mutating-admission-controller)
+  - [Quick Links](#quick-links)
+  - [Purpose](#purpose)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+      - [1. Create a new namespace](#1-create-a-new-namespace)
+      - [2. Configure TLS Certificates](#2-configure-tls-certificates)
+      - [3. Create a Persistent Volume for the Mutating Admission Controller](#3-create-a-persistent-volume-for-the-mutating-admission-controller)
+      - [4. Update the following YAMLs if not done already:](#4-update-the-following-yamls-if-not-done-already)
+      - [5. Deploy using Kustomize:](#5-deploy-using-kustomize)
+      - [6. Restart the deployment](#6-restart-the-deployment)
+
 ## Purpose
 
 Automates the optimization of Kubernetes Pods based on Densify’s recommendations, ensuring resources are effectively allocated for better performance and cost efficiency.
@@ -60,7 +72,7 @@ kubectl  create  namespace  densify-automation
  
 #### 2. Configure TLS Certificates
 
-**Option 1.** [Install cert-manager](/Documentation/Certificates-CertManager.md)
+**Option 1.** [Use CertManager Certificate Generation and Management](/Documentation/Certificates-CertManager.md)
 
 **Option 2.** [Generate Certificates Manually](/Documentation/Certificates-Manual.md)
   
@@ -70,20 +82,25 @@ kubectl  create  namespace  densify-automation
 
 #### 3. Create a Persistent Volume for the Mutating Admission Controller
 
-For a multi-node cluster, follow the steps provided here: [Create a PV using Shared Storage](/Documentation/PersistenVolume.md)
+For a multi-node cluster, follow the steps provided here: [Create a PV using Shared Storage](/Documentation/PersistentVolume.md)
 
 For testing on a single node cluster, you can leverage the `Deployment/densify-recommendations-pv.yaml` file to create the PV. Please make sure you uncomment the line in `kustomization.yaml` file.
 
-#### 4. Deploy using Kustomize:
+
+#### 4. Update the following YAMLs if not done already:
+-  `cluster-info.yaml`: Specify the Kubernetes Cluster name.
+
+-  `densify-configmap.yaml`: Provide the customer’s Densify URL.
+
+-  `densify-api-secret.yaml`: Provide Densify base64-encoded username and password.
+
+-  `densify-automation-policy.yaml`: Define the automation policy (e.g., resources to automate).
+  
+
+#### 5. Deploy using Kustomize:
 
 ```bash
 kubectl  apply  -k  .
-```
-
-#### 5. Update the recommendations cronjob for an initial pull of recommendations from Densify. Change the schedule time:
-
-```bash
-kubectl  edit  cronjob  densify-recommendations-fetcher  -n  densify-automation
 ```
 
 #### 6. Restart the deployment
