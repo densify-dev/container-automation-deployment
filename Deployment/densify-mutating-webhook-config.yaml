@@ -15,6 +15,7 @@ webhooks:
       # Replace <YOUR_CA_BUNDLE_BASE64> with your base64-encoded CA certificate
       caBundle: ""
     failurePolicy: Ignore
+    reinvocationPolicy: IfNeeded
     rules:
       - operations: ["CREATE", "UPDATE"]
         apiGroups: [""]
