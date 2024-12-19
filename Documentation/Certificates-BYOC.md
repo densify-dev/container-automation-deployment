@@ -3,8 +3,7 @@
 1. Ensure you have a valid certificate and key.
 2. Create a Kubernetes Secret:
     ```bash
-    kubectl create secret tls densify-automation-tls --cert=path-to-cert.pem --key=path-to-key.pem \
-        -n densify-automation
+    kubectl create secret tls densify-automation-tls --cert=path-to-cert.pem --key=path-to-key.pem -n densify-automation
     ```
 3. Update the caBundle in the Webhook Configuration
    

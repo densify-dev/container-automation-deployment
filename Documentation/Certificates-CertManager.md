@@ -32,8 +32,7 @@ helm repo add jetstack https://charts.jetstack.io
 helm repo update
 ```
 ```bash
-helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace \
-    --set installCRDs=true
+helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set installCRDs=true
 ```
 
 
