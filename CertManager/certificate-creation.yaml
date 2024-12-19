@@ -9,8 +9,6 @@ spec:
   renewBefore: 240h             # Replace with your prefered renewal time before expiry. Default: Renews 10 days before expiry. 
   commonName: webhook-service.densify-automation.svc
   dnsNames:
-  - webhook-service.densify-automation.svc
-  - webhook-service.densify-automation.svc.cluster.local
   - densify-webhook-service.densify-automation.svc
   - densify-webhook-service.densify-automation.svc.cluster.local
   issuerRef:
