@@ -4,10 +4,7 @@ resources:
   - Deployment/densify-configmap.yaml
   - Deployment/densify-automation-policy.yaml
   #- Deployment/densify-recommendations-pv.yaml
-  - Deployment/densify-service-account.yaml
-  - Deployment/densify-cleanup-rolebinding.yaml
   - Deployment/densify-mutating-webhook-config.yaml
   - Deployment/densify-webhook-deployment.yaml
   - Deployment/densify-webhook-service.yaml
   - Deployment/densify-recommendations-cronjob.yaml
-  - Deployment/densify-cleanup-cronjob.yaml
