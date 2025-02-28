@@ -5,9 +5,11 @@ metadata:
   namespace: densify-automation
 spec:
   schedule: "00 05 * * *" # Runs daily at 5am
+  concurrencyPolicy: Replace
   jobTemplate:
     spec:
-      backoffLimit: 1 # Ensures only one retry in case of failure
+      backoffLimit: 2      
+      ttlSecondsAfterFinished: 86400
       template:
         spec:
           containers:
@@ -18,23 +20,7 @@ spec:
               - |
                 apk add --no-cache curl jq > /dev/null 2>&1;
 
-                # Function for log rotation
-                rotate_logs() {
-                    MAX_SIZE=5242880 # 5MB in bytes
-                    LOG_FILE="/data/densify/densify_reco_cronjob.log"
-                    BACKUP_LOG="${LOG_FILE}.1"
-
-                    if [ -f "$LOG_FILE" ]; then
-                        CURRENT_SIZE=$(stat -c%s "$LOG_FILE")
-                        if [ "$CURRENT_SIZE" -ge "$MAX_SIZE" ]; then
-                            mv "$LOG_FILE" "$BACKUP_LOG"
-                            echo "$(date): Log rotated. Previous log moved to $BACKUP_LOG." > "$LOG_FILE"
-                        fi
-                    fi
-                }
-
-                rotate_logs
-                echo "$(date): Starting Densify recommendations fetcher..." >> /data/densify/densify_reco_cronjob.log;
+                echo "$(date): Starting Densify recommendations fetcher..."
 
                 # Step 1: Authenticate and get the token
                 RESPONSE=$(curl -s -X POST "${DENSIFY_BASE_URL}/api/v2/authorize" \
@@ -43,17 +29,17 @@ spec:
                 TOKEN=$(echo "$RESPONSE" | jq -r '.apiToken');
 
                 if [ -z "$TOKEN" ] || [ "$TOKEN" == "null" ]; then
-                  echo "$(date): Failed to fetch token from Densify API. Response: $RESPONSE" >> /data/densify/densify_reco_cronjob.log;
+                  echo "$(date): Failed to fetch token from Densify API. Response: $RESPONSE"
                   exit 1;
                 fi;
-                echo "$(date): Successfully fetched token." >> /data/densify/densify_reco_cronjob.log;
+                echo "$(date): Successfully fetched token."
 
                 # Step 2: Get subscriptions and handle empty response
                 SUBSCRIPTIONS=$(curl -s -X GET "${DENSIFY_BASE_URL}/api/v2/subscriptions/containers" \
                   -H "Authorization: Bearer $TOKEN");
 
                 if [ -z "$SUBSCRIPTIONS" ]; then
-                  echo "$(date): Subscriptions API response is empty or null." >> /data/densify/densify_reco_cronjob.log;
+                  echo "$(date): Subscriptions API response is empty or null."
                   exit 1;
                 fi;
 
@@ -61,18 +47,18 @@ spec:
                 SUBSCRIPTION_REF=$(echo "$SUBSCRIPTIONS" | jq -r '.[] | select(.subscriptionName == "'"${CLUSTER_NAME}"'") | .subscriptionRef');
 
                 if [ -z "$SUBSCRIPTION_REF" ]; then
-                  echo "$(date): Failed to find subscriptionRef for cluster: ${CLUSTER_NAME}" >> /data/densify/densify_reco_cronjob.log;
-                  echo "$(date): Debugging Subscriptions JSON: $SUBSCRIPTIONS" >> /data/densify/densify_reco_cronjob.log;
+                  echo "$(date): Failed to find subscriptionRef for cluster: ${CLUSTER_NAME}"
+                  echo "$(date): Debugging Subscriptions JSON: $SUBSCRIPTIONS"
                   exit 1;
                 fi;
-                echo "$(date): Successfully fetched subscriptionRef: $SUBSCRIPTION_REF" >> /data/densify/densify_reco_cronjob.log;
+                echo "$(date): Successfully fetched subscriptionRef: $SUBSCRIPTION_REF"
 
                 # Step 3: Fetch recommendations
                 RECOMMENDATIONS=$(curl -s -X GET "${DENSIFY_BASE_URL}/api/v2/subscriptions/containers/${SUBSCRIPTION_REF}?limit=10000&divider=false" \
                   -H "Authorization: Bearer $TOKEN");
 
                 if [ -z "$RECOMMENDATIONS" ]; then
-                  echo "$(date): Failed to fetch recommendations for subscriptionRef: ${SUBSCRIPTION_REF}" >> /data/densify/densify_reco_cronjob.log;
+                  echo "$(date): Failed to fetch recommendations for subscriptionRef: ${SUBSCRIPTION_REF}"
                   exit 1;
                 fi;
 
@@ -80,8 +66,8 @@ spec:
                 RECOMMENDATIONS=$(echo "$RECOMMENDATIONS" | jq -c '.results');
 
                 echo "$RECOMMENDATIONS" > /data/densify/recommendations.json;
-                echo "$(date): Successfully fetched recommendations and saved to /data/densify/recommendations.json" >> /data/densify/densify_reco_cronjob.log;
-                echo "$(date): Recommendations fetch process completed successfully!" >> /data/densify/densify_reco_cronjob.log;
+                echo "$(date): Successfully fetched recommendations and saved to /data/densify/recommendations.json"
+                echo "$(date): Recommendations fetch process completed successfully!"
 
               env:
                 - name: DENSIFY_USERNAME
