@@ -8,67 +8,13 @@ spec:
   concurrencyPolicy: Replace
   jobTemplate:
     spec:
-      backoffLimit: 2      
+      backoffLimit: 2
       ttlSecondsAfterFinished: 86400
       template:
         spec:
           containers:
             - name: recommendations-fetcher
-              image: alpine:3.21
-              command: ["/bin/sh", "-c"]
-              args:
-              - |
-                apk add --no-cache curl jq > /dev/null 2>&1;
-
-                echo "$(date): Starting Densify recommendations fetcher..."
-
-                # Step 1: Authenticate and get the token
-                RESPONSE=$(curl -s -X POST "${DENSIFY_BASE_URL}/api/v2/authorize" \
-                  -H "Content-Type: application/json" \
-                  -d '{"userName": "'"${DENSIFY_USERNAME}"'", "pwd": "'"${DENSIFY_PASSWORD}"'"}');
-                TOKEN=$(echo "$RESPONSE" | jq -r '.apiToken');
-
-                if [ -z "$TOKEN" ] || [ "$TOKEN" == "null" ]; then
-                  echo "$(date): Failed to fetch token from Densify API. Response: $RESPONSE"
-                  exit 1;
-                fi;
-                echo "$(date): Successfully fetched token."
-
-                # Step 2: Get subscriptions and handle empty response
-                SUBSCRIPTIONS=$(curl -s -X GET "${DENSIFY_BASE_URL}/api/v2/subscriptions/containers" \
-                  -H "Authorization: Bearer $TOKEN");
-
-                if [ -z "$SUBSCRIPTIONS" ]; then
-                  echo "$(date): Subscriptions API response is empty or null."
-                  exit 1;
-                fi;
-
-                # Find the subscriptionRef for the cluster
-                SUBSCRIPTION_REF=$(echo "$SUBSCRIPTIONS" | jq -r '.[] | select(.subscriptionName == "'"${CLUSTER_NAME}"'") | .subscriptionRef');
-
-                if [ -z "$SUBSCRIPTION_REF" ]; then
-                  echo "$(date): Failed to find subscriptionRef for cluster: ${CLUSTER_NAME}"
-                  echo "$(date): Debugging Subscriptions JSON: $SUBSCRIPTIONS"
-                  exit 1;
-                fi;
-                echo "$(date): Successfully fetched subscriptionRef: $SUBSCRIPTION_REF"
-
-                # Step 3: Fetch recommendations
-                RECOMMENDATIONS=$(curl -s -X GET "${DENSIFY_BASE_URL}/api/v2/subscriptions/containers/${SUBSCRIPTION_REF}?limit=10000&divider=false" \
-                  -H "Authorization: Bearer $TOKEN");
-
-                if [ -z "$RECOMMENDATIONS" ]; then
-                  echo "$(date): Failed to fetch recommendations for subscriptionRef: ${SUBSCRIPTION_REF}"
-                  exit 1;
-                fi;
-
-                # Extract the results section
-                RECOMMENDATIONS=$(echo "$RECOMMENDATIONS" | jq -c '.results');
-
-                echo "$RECOMMENDATIONS" > /data/densify/recommendations.json;
-                echo "$(date): Successfully fetched recommendations and saved to /data/densify/recommendations.json"
-                echo "$(date): Recommendations fetch process completed successfully!"
-
+              image: densify/container-recommendation-fetcher:1.0
               env:
                 - name: DENSIFY_USERNAME
                   valueFrom:
