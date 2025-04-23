@@ -5,13 +5,12 @@
   - [Quick Links](#quick-links)
   - [Overview](#overview)
   - [Install cert-manager](#install-cert-manager)
-    - [Using Helm](#using-helm)
-    - [Apply its Manifest Directly:](#apply-its-manifest-directly)
   - [Verify that cert-manager components are running:](#verify-that-cert-manager-components-are-running)
   - [Deploy the `ClusterIssuer` configuration:](#deploy-the-clusterissuer-configuration)
   - [Review and update if necessary `./CertManager/certificate-creation.yaml`](#review-and-update-if-necessary-certmanagercertificate-creationyaml)
   - [Deploy the certificate configuration:](#deploy-the-certificate-configuration)
   - [Enable certManager to automate management of your certificate](#enable-certmanager-to-automate-management-of-your-certificate)
+  - [Restart your Mutating Webhook Server:](#restart-your-mutating-webhook-server)
   
   
 ## Overview
@@ -21,25 +20,7 @@ cert-manager simplifies certificate lifecycle management for Kubernetes. Follow 
 
 ## Install cert-manager
 
-Install cert-manager using either the Helm option or via applying its manifest directly. 
-   
-### Using Helm
-
-```bash
-helm repo add jetstack https://charts.jetstack.io
-```
-```bash
-helm repo update
-```
-```bash
-helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set installCRDs=true
-```
-
-
-### Apply its Manifest Directly:
-```bash
-kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.16.2/cert-manager.yaml
-```
+See installation steps [here](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
 
 ## Verify that cert-manager components are running:
 ```bash
@@ -55,6 +36,7 @@ kubectl apply -f ./CertManager/selfsigned-clusterissuer.yaml
 ```bash
 kubectl apply -f ./CertManager/certificate-creation.yaml
 ```
+TODO: Cannot run this before 'densify-automation' namespace exist
 
 ## Enable certManager to automate management of your certificate
 
@@ -64,3 +46,8 @@ kubectl apply -f ./CertManager/certificate-creation.yaml
    ```bash
    kubectl apply -f Deployment/densify-mutating-webhook-config.yaml
    ```
+
+## Restart your Mutating Webhook Server:
+```bash
+kubectl rollout restart deployment densify-webhook-server -n densify-automation
+```

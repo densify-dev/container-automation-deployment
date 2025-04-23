@@ -5,3 +5,4 @@ metadata:
   namespace: densify-automation
 data:
   DENSIFY_BASE_URL: "https://<customerName>.densify.com:443"
+  #RECOMMENDATION_AGE: "5"            # Disqualifies automation if recommendation is older than x days

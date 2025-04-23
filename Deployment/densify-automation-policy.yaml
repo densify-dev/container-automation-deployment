@@ -4,17 +4,112 @@ metadata:
   name: densify-automation-policy
   namespace: densify-automation
 data:
-    # Valid options are: 
-        # CPULimit: Disable/Enable   
-        # CPURequest: Disable/Enable
-        # MemLimit: Disable/Enable
-        # MemRequest: Disable/Enable
-        # DownsizeUpsize: Downsize/Upsize/Both
-        # SetUninitializedValues: Disable/Enable        This option indicates whether you want previously unset settings to now have a value as per Densify's recommendation
   densify-automation-policy: |-
-    CPULimit: Disable   
-    CPURequest: Enable
-    MemLimit: Disable
-    MemRequest: Disable
-    DownsizeUpsize: Downsize
-    SetUninitializedValues: Disable
+    automationenabled: true       # Global Switch to enable/disable automation for the cluster
+    defaultpolicy: cpu-reclaim    # Default policy if no specific policy has been defined in the webhook definition
+    remoteenablement: false       # false: Enable automation within webhook definition only   
+                                  # true:  Enable automation within webhook definition and Densify UI                                                                   
+    policiesbyname:
+      # ----------------------------------------------------------------------  
+      # Starting Policy Candidate
+      #     - Reclaims CPU request only
+      #     - Doesn't change mem config
+      #     - Doesn't upsize so no quota, limit range or node size concerns
+      #
+      cpu-reclaim:
+        enablement:
+          cpu:
+            request:
+              downsize: true
+      # ----------------------------------------------------------------------  
+      # Starting Policy Candidate
+      #	    - Reclaims CPU and Memory (requests only)
+      #     - Doesn't upsize so no quota, limit range or node size concerns
+      #
+      cpu-mem-reclaim:
+        enablement:
+          cpu:
+            request:
+              downsize: true
+          memory:
+            request:
+              downsize: true
+      # ----------------------------------------------------------------------  
+      # Optimizes all request values
+      # Note: confirm sufficient quota before enabling
+      #
+      full-request-management:
+        enablement:
+          cpu:
+            request:
+              upsize: true
+              downsize: true
+              set-uninitialized-values: true
+            limit:
+              upsize: true
+          memory:
+            request:
+              upsize: true
+              downsize: true
+              set-uninitialized-values: true
+            limit:
+              upsize: true
+      # ----------------------------------------------------------------------  
+      # Bump up memory limits to stops OOM kills
+      # Note: confirm sufficient quota before enabling
+      #
+      limit-oom-prevention:
+        enablement:
+          memory:
+            limit:
+              upsize: true
+      # ----------------------------------------------------------------------  
+      # Bump up CPU & Memory limits to relieve pressure
+      # Note: confirm sufficient quota before enabling
+      #
+      limit-oom-throttling-prevention:
+        enablement:
+          cpu:
+            limit:
+              upsize: true
+          memory:
+            limit:
+              upsize: true
+      # ----------------------------------------------------------------------  
+      # Ensure all limits have values and are not too low
+      # Note: confirm sufficient quota before enabling
+      #
+      full-limit-management:
+        enablement:
+          cpu:
+            limit:
+              upsize: true
+              set-uninitialized-values: true
+          memory:
+            limit:
+              upsize: true
+              set-uninitialized-values: true
+      # ----------------------------------------------------------------------  
+      # Automate all request and limit values
+      # Note: confirm sufficient quota before enabling
+      # 
+      full-optimization:
+        enablement:
+          cpu:
+            request:
+              upsize: true
+              downsize: true
+              set-uninitialized-values: true
+            limit:
+              upsize: true
+              downsize: true
+              set-uninitialized-values: true
+          memory:
+            request:
+              upsize: true
+              downsize: true
+              set-uninitialized-values: true
+            limit:
+              upsize: true
+              downsize: true
+              set-uninitialized-values: true

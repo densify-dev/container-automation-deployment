@@ -4,17 +4,17 @@ metadata:
   name: densify-recommendations-fetcher
   namespace: densify-automation
 spec:
-  schedule: "00 05 * * *" # Runs daily at 5am
+  schedule: "*/30 * * * *" # Runs Every 30 min
   concurrencyPolicy: Replace
   jobTemplate:
     spec:
       backoffLimit: 2
-      ttlSecondsAfterFinished: 86400
+      ttlSecondsAfterFinished: 1800
       template:
         spec:
           containers:
             - name: recommendations-fetcher
-              image: densify/container-recommendation-fetcher:1.0
+              image: densify/container-recommendation-fetcher:1.1
               env:
                 - name: DENSIFY_USERNAME
                   valueFrom:
@@ -38,7 +38,7 @@ spec:
                       key: clusterName
               volumeMounts:
                 - name: recommendations-volume
-                  mountPath: /data/densify
+                  mountPath: /densify/data
           restartPolicy: Never
           volumes:
             - name: recommendations-volume

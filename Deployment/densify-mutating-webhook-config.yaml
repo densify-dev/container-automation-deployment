@@ -11,7 +11,7 @@ webhooks:
       service:
         name: densify-webhook-service
         namespace: densify-automation
-        path: "/mutate"
+        path: "/mutate" # To specify a specific policy for this webhook use /mutate/<policyName>
       # Replace <YOUR_CA_BUNDLE_BASE64> with your base64-encoded CA certificate
       caBundle: ""
     failurePolicy: Ignore
@@ -19,9 +19,16 @@ webhooks:
     rules:
       - operations: ["CREATE", "UPDATE"]
         apiGroups: [""]
-        apiVersions: ["v1"]  
+        apiVersions: ["v1"]
         resources: ["pods"]
         scope: "Namespaced"
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: Not In
+          values:
+            - densify
+            - kube-system
     objectSelector:
       matchLabels:
         densify-automation: "true"

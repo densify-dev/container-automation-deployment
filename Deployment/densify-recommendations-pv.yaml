@@ -7,7 +7,7 @@ spec:
   capacity:
     storage: 1Gi
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   hostPath:
     path: /mnt/data/densify-recommendations
 ---
@@ -18,7 +18,7 @@ metadata:
   namespace: densify-automation
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi

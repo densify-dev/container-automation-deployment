@@ -1,0 +1,97 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: densify-resource-optimization-webhook
+  # Uncomment the below annotation 'cert-manager.io/inject-ca-from' if using cert-manager
+  annotations:
+    cert-manager.io/inject-ca-from: densify-automation/densify-automation-cert
+webhooks:
+  - name: resource-optimizer-prod.densify.com
+    clientConfig:
+      service:
+        name: densify-webhook-service
+        namespace: densify-automation
+        path: "/mutate/cpu-reclaim"
+      # Replace <YOUR_CA_BUNDLE_BASE64> with your base64-encoded CA certificate
+      caBundle: ""
+    failurePolicy: Ignore
+    reinvocationPolicy: IfNeeded
+    rules:
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+        scope: "Namespaced"
+    # Valid matchExpressions operators are: In, NotIn, Exists, DoesNotExist, Gt, Lt
+    namespaceSelector:
+      matchLabels:
+        environment: "prod"
+    objectSelector:
+      matchLabels:
+        kubex-automation: "true"
+    admissionReviewVersions: ["v1"]
+    sideEffects: "None"
+    timeoutSeconds: 10
+
+  # ----------------------------------------------------------------------------------
+  - name: resource-optimizer-all.densify.com
+    clientConfig:
+      service:
+        name: densify-webhook-service
+        namespace: densify-automation
+        path: "/mutate/full-request-management"
+      # Replace <YOUR_CA_BUNDLE_BASE64> with your base64-encoded CA certificate
+      caBundle: ""
+    failurePolicy: Ignore
+    reinvocationPolicy: IfNeeded
+    rules:
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+        scope: "Namespaced"
+    # Valid matchExpressions operators are: In, NotIn, Exists, DoesNotExist, Gt, Lt
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - staging
+            - demo
+    objectSelector:
+      matchLabels:
+        densify-automation: "true"
+    admissionReviewVersions: ["v1"]
+    sideEffects: "None"
+    timeoutSeconds: 10
+
+  # ----------------------------------------------------------------------------------
+  - name: resource-optimizer-test.densify.com
+    clientConfig:
+      service:
+        name: densify-webhook-service
+        namespace: densify-automation
+        path: "/mutate/cpu-mem-reclaim"
+      # Replace <YOUR_CA_BUNDLE_BASE64> with your base64-encoded CA certificate
+      caBundle: ""
+    failurePolicy: Ignore
+    reinvocationPolicy: IfNeeded
+    rules:
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+        scope: "Namespaced"
+    # Valid matchExpressions operators are: In, NotIn, Exists, DoesNotExist, Gt, Lt
+    objectSelector:
+      matchExpressions:
+        - { key: tier, operator: Exists }
+        - { key: env, operator: NotIn, values: ["production", "prod"] }
+        - {
+            key: workload-type,
+            operator: In,
+            values: ["batch", "transactional"],
+          }
+    admissionReviewVersions: ["v1"]
+    sideEffects: "None"
+    timeoutSeconds: 10
