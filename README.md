@@ -37,13 +37,14 @@ For initial configuration, you need to review and update the following YAML file
 
 -  `densify-api-secret.yaml`: Provide your Densify base64-encoded username and password.
 
--  `densify-automation-policy.yaml`: 
-   -  [Define/Refine the automation policies](./Documentation/Multi-Policy-Support.md#supported-out-of-the-box-policies) (e.g., resources to automate).
-   -  [Define which policy will be your default policy](./Documentation/Multi-Policy-Support.md#default-policy-behavior) This will be used in case you have not explicitly specified the policy to be used by a webhook definition.
-   -  [Global switch to enable/disable automation within the cluster](./Documentation/Multi-Policy-Support.md)
-   -  Define if you would like to control automation enablement within Kubernetes cluster only or add a secondary level of control from Densify UI
+- `densify-automation-policy.yaml`:  
+   - [Define or refine automation policies](./Documentation/Multi-Policy-Support.md#supported-out-of-the-box-policies) — e.g., specify which resource values (CPU/Memory requests/limits) should be automated.  
+   - [Set the default policy](./Documentation/Multi-Policy-Support.md#default-policy-behavior) — applied when a webhook does not explicitly reference a specific policy.  
+   - [Enable or disable automation cluster-wide](./Documentation/Multi-Policy-Support.md#automationenabled) — acts as a global switch to turn on/off all mutations by the controller.  
+   - [Control whether automation can be remotely enabled/disabled via the Densify UI](./Documentation/Multi-Policy-Support.md#remoteenablement) — adds a second layer of dynamic control over policy activation.
 
-- `densify-mutating-webhook-config.yaml`: [Provide definition of which pods will be candidates for mutation by the mutating webhook and which policy should be used](./Documentation/Multi-Policy-Support.md#example-webhook-structure)
+- `densify-mutating-webhook-config.yaml`:  
+   - [Define which pods are candidates for mutation](./Documentation/Multi-Policy-Support.md#example-webhook-structure) — using `namespaceSelector` and `objectSelector`, specify which workloads should be mutated and which policy route (`/mutate/...`) to apply.
   
 
 #### 2. Create a Persistent Volume for the Mutating Admission Controller
