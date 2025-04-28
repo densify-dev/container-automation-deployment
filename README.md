@@ -31,9 +31,7 @@ Automates the optimization of Kubernetes Pods based on Densify’s recommendatio
 
 For initial configuration, you need to review and update the following YAML files:
 
--  `cluster-info.yaml`: Specify the Kubernetes Cluster name.
-
--  `densify-configmap.yaml`: Provide your Densify URL.
+-  `densify-configmap.yaml`: Provide your Densify URL and Kubernetes Cluster name.
 
 -  `densify-api-secret.yaml`: Provide your Densify base64-encoded username and password.
 
