@@ -44,8 +44,8 @@ spec:
             - name: CLUSTER_NAME
               valueFrom:
                 configMapKeyRef:
-                  name: cluster-info
-                  key: clusterName
+                  name: densify-config
+                  key: CLUSTER_NAME
             - name: RECOMMENDATION_AGE
               valueFrom:
                 configMapKeyRef:

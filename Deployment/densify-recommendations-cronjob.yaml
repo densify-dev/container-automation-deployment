@@ -34,8 +34,8 @@ spec:
                 - name: CLUSTER_NAME
                   valueFrom:
                     configMapKeyRef:
-                      name: cluster-info
-                      key: clusterName
+                      name: densify-config
+                      key: CLUSTER_NAME
               volumeMounts:
                 - name: recommendations-volume
                   mountPath: /densify/data
