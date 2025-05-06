@@ -1,0 +1,5 @@
+resources:
+  - densify-api-secret.yaml
+  - densify-automation-policy.yaml
+  - densify-configmap.yaml
+#  - densify-recommendations-pv.yaml

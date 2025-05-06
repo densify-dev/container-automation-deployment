@@ -1,0 +1,4 @@
+resources:
+  - densify-mutating-webhook-config.yaml
+  - densify-webhook-deployment.yaml
+  - densify-webhook-service.yaml

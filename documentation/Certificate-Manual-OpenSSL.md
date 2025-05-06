@@ -24,6 +24,6 @@ cat ca.pem | base64 -w 0
 
 Apply the updated MutatingWebhookConfiguration:
 ```bash
-kubectl apply -f Deployment/densify-mutating-webhook-config.yaml
+kubectl apply -f deployment/webhook/densify-mutating-webhook-config.yaml
 ```
 

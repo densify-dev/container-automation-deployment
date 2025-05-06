@@ -1,0 +1,3 @@
+resources:
+  - densify-recommendations-cronjob.yaml
+  - densify-recommendations-job.yaml

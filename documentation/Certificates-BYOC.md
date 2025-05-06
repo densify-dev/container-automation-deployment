@@ -7,7 +7,7 @@
     ```
 3. Update the caBundle in the Webhook Configuration
    
-   Base64-encode the CA certificate and update caBundle in the `densify-mutating-webhook-config.yaml`
+   Base64-encode the CA certificate and update caBundle in the `deployment/webhook/densify-mutating-webhook-config.yaml`
    ```bash
    cat ca.pem | base64 -w 0
    ```
@@ -15,5 +15,5 @@
    
    Apply the updated MutatingWebhookConfiguration:
    ```bash
-   kubectl apply -f Deployment/densify-mutating-webhook-config.yaml
+   kubectl apply -f deployment/webhook/densify-mutating-webhook-config.yaml
    ```

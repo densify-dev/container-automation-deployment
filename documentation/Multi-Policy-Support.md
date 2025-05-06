@@ -17,7 +17,7 @@ By defining multiple webhooks with distinct rules and expressions, you can:
 
 
 ## Global Configuration Flags
-In the `densify-automation-policy.yaml` file, you’ll find two important global switches that govern controller behavior:
+In the `deployment/base/densify-automation-policy.yaml` file, you’ll find two important global switches that govern controller behavior:
 
 ### `automationenabled`
 - **Type:** `boolean`
