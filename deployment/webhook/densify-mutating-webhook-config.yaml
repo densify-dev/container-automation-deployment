@@ -28,6 +28,7 @@ webhooks:
           operator: NotIn
           values:
             - densify
+            - densify-automation
             - kube-system
     objectSelector:
       matchLabels:
