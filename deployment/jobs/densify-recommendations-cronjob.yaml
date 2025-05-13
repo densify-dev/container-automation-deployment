@@ -15,6 +15,7 @@ spec:
           containers:
             - name: recommendations-fetcher
               image: densify/container-recommendation-fetcher:1.1
+              imagePullPolicy: Always
               env:
                 - name: DENSIFY_USERNAME
                   valueFrom:
