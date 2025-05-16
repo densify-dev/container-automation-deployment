@@ -15,6 +15,7 @@ This project enables Kubernetes users to automate pod resource configuration usi
       - [4. Configure TLS Certificates](#4-configure-tls-certificates)
       - [5. Run the deployment script](#5-run-the-deployment-script)
       - [6. Verify resources are up and running](#6-verify-resources-are-up-and-running)
+  - [Troubleshooting](#troubleshooting)
 
 ## Purpose
 
@@ -80,3 +81,8 @@ For testing on a single node cluster, you can leverage the `deployment/base/dens
 ```bash
 kubectl get pod -n densify-automation
 ```
+
+
+## Troubleshooting
+
+For more guidance on troubleshooting the mutating admission controller, please refer to our [Troubleshooting Guide](/documentation/Troubleshooting.md)
