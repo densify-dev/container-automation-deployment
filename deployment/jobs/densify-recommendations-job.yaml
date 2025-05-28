@@ -8,6 +8,10 @@ spec:
   ttlSecondsAfterFinished: 1800
   template:
     spec:
+      securityContext:
+        fsGroup: 3000
+        runAsUser: 3000
+        runAsGroup: 3000
       containers:
         - name: recommendations-fetcher
           image: densify/container-recommendation-fetcher:1.1

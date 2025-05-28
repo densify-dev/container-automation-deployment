@@ -11,7 +11,7 @@ This project enables Kubernetes users to automate pod resource configuration usi
   - [Installation](#installation)
       - [1. Update config files](#1-update-config-files)
       - [2. Create densify-automation namespace](#2-create-densify-automation-namespace)
-      - [3. Create a Persistent Volume for the Mutating Admission Controller](#3-create-a-persistent-volume-for-the-mutating-admission-controller)
+      - [3. Create a Persistent Volume Claim for the Mutating Admission Controller](#3-create-a-persistent-volume-claim-for-the-mutating-admission-controller)
       - [4. Configure TLS Certificates](#4-configure-tls-certificates)
       - [5. Run the deployment script](#5-run-the-deployment-script)
       - [6. Verify resources are up and running](#6-verify-resources-are-up-and-running)
@@ -54,11 +54,18 @@ For initial configuration, you need to review and update the following YAML file
 kubectl create namespace densify-automation
 ```
 
-#### 3. Create a Persistent Volume for the Mutating Admission Controller
+#### 3. Create a Persistent Volume Claim for the Mutating Admission Controller
 
-For a multi-node cluster, follow the steps provided here: [Create a PV using Shared Storage](/documentation/PersistentVolume.md)
+To persist recommendation state and automation outputs, the Mutating Admission Controller requires a Persistent Volume Claim (PVC) with ReadWriteOnce access.
 
-For testing on a single node cluster, you can leverage the `deployment/base/densify-recommendations-pv.yaml` file to create the PV. Please make sure you uncomment the line in `base/kustomization.yaml` file.
+If deploying a single replica, no additional configuration is needed — most cluster default StorageClasses will work.
+
+If deploying multiple replicas for high availability, you must ensure your PVC uses a backend that supports ReadWriteMany, such as Azure Files, EFS, or NFS.
+
+You can use the provided example at: `deployment/base/densify-recommendations-pvc.yaml`
+
+
+For detailed guidance, refer to: [Persistent Volume Claim Requirements](/documentation/PersistentVolumeClaim.md)
 
 
 #### 4. Configure TLS Certificates
