@@ -15,6 +15,9 @@ This project enables Kubernetes users to automate pod resource configuration usi
       - [4. Configure TLS Certificates](#4-configure-tls-certificates)
       - [5. Run the deployment script](#5-run-the-deployment-script)
       - [6. Verify resources are up and running](#6-verify-resources-are-up-and-running)
+  - [Argo CD Integration](#argo-cd-integration)
+    - [Add Resource Customizations to argocd-cm](#add-resource-customizations-to-argocd-cm)
+    - [How to Apply](#how-to-apply)
   - [Troubleshooting](#troubleshooting)
 
 ## Purpose
@@ -36,7 +39,11 @@ For initial configuration, you need to review and update the following YAML file
 
 -  `densify-configmap.yaml`: Provide your Densify URL and Kubernetes Cluster name.
 
--  `densify-api-secret.yaml`: Provide your Densify base64-encoded username and password.
+-  `densify-api-secret.yaml`: Provide your Densify base64-encoded username and password. To do this run: 
+   ```bash
+   echo -n "<my_user>" | base64
+   echo -n "<my_password>" | base64
+   ```
 
 - `densify-automation-policy.yaml`:  
    - [Define or refine automation policies](./documentation/Multi-Policy-Support.md#supported-out-of-the-box-policies) — e.g., specify which resource values (CPU/Memory requests/limits) should be automated.  
@@ -45,7 +52,7 @@ For initial configuration, you need to review and update the following YAML file
    - [Control whether automation can be remotely enabled/disabled via the Densify UI](./documentation/Multi-Policy-Support.md#remoteenablement) — adds a second layer of dynamic control over policy activation.
 
 - `densify-mutating-webhook-config.yaml`:  
-   - [Define which pods are candidates for mutation](./documentation/Multi-Policy-Support.md#example-webhook-structure) — using `namespaceSelector` and `objectSelector`, specify which workloads should be mutated and which policy route (`/mutate/...`) to apply.
+   - [Define which pods are candidates for mutation](./documentation/Multi-Policy-Support.md#example-webhook-structure) — using `namespaceSelector` and `objectSelector`, specify which workloads should be mutated and which policy route (`/mutate/<policyName>`) to apply.
   
 
 #### 2. Create densify-automation namespace
@@ -89,6 +96,61 @@ For detailed guidance, refer to: [Persistent Volume Claim Requirements](/documen
 kubectl get pod -n densify-automation
 ```
 
+
+## Argo CD Integration
+
+If your Kubernetes cluster uses Argo CD, and you are enabling automated mutations via the Densify Mutating Admission Controller, you should configure Argo CD to ignore resource-related changes made by the controller.
+
+This prevents:
+
+- Applications from showing OutOfSync status unnecessarily.
+
+- Infinite reconciliation loops when the Self-Heal flag is enabled.
+
+### Add Resource Customizations to argocd-cm
+Update the argocd-cm ConfigMap to ignore differences in container resource requests and limits for common workload types:
+
+```bash
+data:
+  resource.customizations: |
+    apps/Deployment:
+      ignoreDifferences: |
+        jqPathExpressions:
+          - .spec.template.spec.containers[].resources.requests
+          - .spec.template.spec.containers[].resources.limits
+    apps/StatefulSet:
+      ignoreDifferences: |
+        jqPathExpressions:
+          - .spec.template.spec.containers[].resources.requests
+          - .spec.template.spec.containers[].resources.limits
+    apps/DaemonSet:
+      ignoreDifferences: |
+        jqPathExpressions:
+          - .spec.template.spec.containers[].resources.requests
+          - .spec.template.spec.containers[].resources.limits
+    argoproj.io/Rollout:
+      ignoreDifferences: |
+        jqPathExpressions:
+          - .spec.template.spec.containers[].resources.requests
+          - .spec.template.spec.containers[].resources.limits
+```
+
+### How to Apply
+1. Edit the ConfigMap:
+
+   ```bash
+   kubectl edit configmap argocd-cm -n argocd
+   ```
+
+2. Add or merge the `resource.customizations` block under `data`.
+
+3. Restart the Argo CD application controller:
+
+   ```bash
+   kubectl rollout restart deployment argocd-application-controller -n argocd
+   ```
+   
+Once applied, Argo CD will ignore the mutations made by Densify and eliminate unnecessary sync errors and loops.
 
 ## Troubleshooting
 

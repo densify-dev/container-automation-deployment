@@ -4,6 +4,7 @@ metadata:
   name: densify-recommendations-pvc
   namespace: densify-automation
 spec:
+  volumeBindingMode: Immediate
   accessModes:
     - ReadWriteOnce
   resources:

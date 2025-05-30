@@ -5,6 +5,8 @@
 **Issue**  
 Applying `certificate-creation.yaml` fails with:
 
+![Alt Text](./MissingNamespace.png)
+
 **Solution**  
 Create the `densify-automation` namespace:
 ```bash
@@ -17,6 +19,8 @@ kubectl create namespace densify-automation
 
 **Issue**  
 The webhook cannot find the required policy config.
+
+![Alt Text](./MissingPolicy.png)
 
 **Solution**  
 Ensure the ConfigMap is created:
@@ -36,15 +40,21 @@ kubectl get configmap densify-automation-policy -n densify-automation
 **Issue**  
 Webhook fails to authenticate due to token errors.
 
+![Alt Text](./TokenFailure.png)
+
 **Solution**  
 - Ensure the username and password are:
   - Correct
-  - Base64 encoded
+  - Base64 encoded: 
+  ```bash
+   echo -n "<my_user>" | base64
+   echo -n "<my_password>" | base64
+   ```
 
 - Validate the secret:
-```bash
-kubectl get secret densify-api-secret -n densify-automation -o yaml
-```
+  ```bash
+  kubectl get secret densify-api-secret -n densify-automation -o yaml
+  ```
 
 ---
 
@@ -52,6 +62,8 @@ kubectl get secret densify-api-secret -n densify-automation -o yaml
 
 **Issue**  
 Pod is not running correctly.
+
+![Alt Text](./PodCrashLoopBackOff.png)
 
 **Solution**  
 Check logs for error messages:
@@ -78,12 +90,18 @@ Possible causes:
   - If using manual TLS certs, ensure the base64-encoded certificate is injected correctly in `MutatingWebhookConfiguration`.
   - If using CertManager, ensure you uncomment the annotation section in `densify-mutating-webhook-config.yaml`.
 
+
+  ![Alt Text](./CertManagerAnnotation.png)
+
+
 ---
 
 ## 6. TLS Handshake Error when Mutating Pods
 
 **Issue**  
 TLS handshake errors are visible in logs or Kubernetes events.
+
+  ![Alt Text](./TLShandshakeError.png) 
 
 **Solution**  
 - Ensure your certificate is valid and correctly signed.
@@ -96,11 +114,15 @@ TLS handshake errors are visible in logs or Kubernetes events.
 **Issue**  
 Job `densify-recommendations-job` remains in a `Pending` state.
 
+  ![Alt Text](./PodPending.png) 
+
 **Solution**  
 Inspect the pod:
 ```bash
 kubectl describe pod <pod_name> -n densify-automation
 ```
+
+  ![Alt Text](./PVCerror.png) 
 
 Check the Events section for:
 - Insufficient resources
@@ -116,6 +138,8 @@ Ensure:
 
 **Issue**  
 The webhook does not reflect updated recommendations.
+
+  ![Alt Text](./RecosNotLoaded.png) 
 
 **Solution**  
 Reload the job:
@@ -142,6 +166,8 @@ Possible causes:
   The webhook receives the policy name from the request path:  
   `/mutate/<policyName>`  
   If the path is incorrectly defined in the `MutatingWebhookConfiguration`, it may default to an unintended policy.
+
+    ![Alt Text](./PolicyPath.png) 
 
 - **No Policy Name Defined → Falls Back to Default**  
   If the webhook request path omits the policy name (e.g., `/mutate/`), the controller uses the default policy defined in `densify-automation-policy.yaml`.
