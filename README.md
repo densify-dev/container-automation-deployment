@@ -1,5 +1,16 @@
+# :no_entry: [DEPRECATED] Please see [Kubex automation controller helm chart](https://github.com/densify-dev/helm-charts/tree/master/charts/kubex-automation-controller)
 
-# Densify Container Automation - Mutating Admission Controller
+<picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://www.densify.com/wp-content/uploads/kubex-by-densify-logo-reverse.png">
+    <source media="(prefers-color-scheme: light)" srcset="https://www.densify.com/wp-content/uploads/kubex-by-densify-logo.png">
+    <img src="https://www.densify.com/wp-content/uploads/kubex-by-densify-logo.png" width="300">
+</picture>
+
+## Deprecation Notice
+
+This repository is deprecated as of July 7th, 2025. Please refer to the [Kubex automation controller helm chart](https://github.com/densify-dev/helm-charts/tree/master/charts/kubex-automation-controller).
+
+## Densify Container Automation - Mutating Admission Controller
 
 This project enables Kubernetes users to automate pod resource configuration using Densify’s optimization engine via a Mutating Admission Controller.
 
